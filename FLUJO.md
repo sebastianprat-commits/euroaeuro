@@ -15,6 +15,17 @@ cd C:\AI\Proyectos\Web\euroaeuro
 .venv\Scripts\python.exe generar.py --siguiente 4
 ```
 
+## Cuando la cola se queda corta
+
+```bat
+.venv\Scripts\python.exe proponer.py --n 10 --ver   :: ver qué propondría, sin guardar
+.venv\Scripts\python.exe proponer.py --n 10         :: añadirlos a temas.csv
+```
+
+El proponedor conoce los 91 publicados y todo lo que está en cola, y descarta lo que se parezca
+demasiado. Aun así, **pásale el `--ver` antes**: el modelo a veces cuela una errata o un tema
+repetido con otro enfoque, y es más rápido corregirlo en el CSV que reescribir un artículo entero.
+
 - Tarda unos 35 segundos por artículo: **4 artículos ≈ 2,5 minutos**.
 - Se guardan en `contenido\borradores\` como `slug.md` + `slug.json`.
 - `temas.csv` marca esos temas como `generado`, así que la próxima vez empieza por el 5.
