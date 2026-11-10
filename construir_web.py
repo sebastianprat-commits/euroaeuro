@@ -46,7 +46,7 @@ MAILERLITE_FORM = """
     <div class="ml-form-embedBody row-form">
       <form class="ml-block-form"
             action="https://assets.mailerlite.com/jsonp/2784740/forms/203766011908851480/subscribe"
-            method="post" target="_blank"
+            method="post"
             style="display:flex;flex-wrap:wrap;gap:12px;align-items:end">
         <div style="flex:1;min-width:220px">
           <label for="ml-email" style="display:block;font-weight:600;margin-bottom:6px">Tu correo</label>
@@ -57,6 +57,7 @@ MAILERLITE_FORM = """
         <input type="hidden" name="ml-submit" value="1">
         <input type="hidden" name="anticsrf" value="true">
         <button class="btn" style="background:#14201A;color:#fff" type="submit">Suscribirme</button>
+        <p id="ml-estado" style="flex-basis:100%;margin:4px 0 0;font-size:14px;display:none"></p>
         <p style="flex-basis:100%;font-size:13px;margin:0;opacity:.85">
           Al suscribirte aceptas la <a href="/privacidad/" style="color:inherit">política de privacidad</a>.
           Puedes darte de baja cuando quieras.
@@ -64,20 +65,63 @@ MAILERLITE_FORM = """
       </form>
     </div>
     <div class="ml-form-successBody row-success" style="display:none">
-      <p style="font-weight:600;margin:0">Gracias. Te hemos enviado un correo para confirmar la suscripción.</p>
+      <p style="font-weight:600;margin:0 0 6px">Gracias. Te hemos enviado un correo para confirmar la suscripción.</p>
+      <p style="margin:0;font-size:14px;opacity:.85">Revisa también la carpeta de spam. Hasta que no confirmes, no recibirás la newsletter.</p>
     </div>
   </div>
 </div>
 <script>
-  function ml_webform_success_48368733() {
-    var c = document.querySelector('.ml-subscribe-form-48368733');
-    if (!c) return;
-    var f = c.querySelector('.row-form'), s = c.querySelector('.row-success');
-    if (f) f.style.display = 'none';
-    if (s) s.style.display = 'block';
+(function () {
+  var caja = document.querySelector('.ml-subscribe-form-48368733');
+  if (!caja) return;
+  var form = caja.querySelector('.ml-block-form');
+  var estado = caja.querySelector('#ml-estado');
+  var boton = form.querySelector('button[type="submit"]');
+  var textoBoton = boton.textContent;
+
+  function aviso(texto) {
+    estado.textContent = texto;
+    estado.style.display = 'block';
+    boton.disabled = false;
+    boton.textContent = textoBoton;
   }
+
+  form.addEventListener('submit', function (ev) {
+    ev.preventDefault();
+    var email = form.querySelector('input[name="fields[email]"]').value.trim();
+    if (!email) return;
+    boton.disabled = true;
+    boton.textContent = 'Enviando…';
+    estado.style.display = 'none';
+
+    var datos = new URLSearchParams();
+    datos.set('fields[email]', email);
+    datos.set('ml-submit', '1');
+    datos.set('anticsrf', 'true');
+
+    fetch(form.action, {
+      method: 'POST',
+      body: datos,
+      mode: 'cors',
+      headers: { 'Accept': 'application/json' }
+    })
+      .then(function (r) { return r.json(); })
+      .then(function (j) {
+        if (j && j.success) {
+          caja.querySelector('.row-form').style.display = 'none';
+          caja.querySelector('.row-success').style.display = 'block';
+        } else {
+          var detalle = (j && j.errors && j.errors.fields && j.errors.fields.email)
+            ? ' Revisa que el correo esté bien escrito.' : '';
+          aviso('No hemos podido completar la suscripción.' + detalle);
+        }
+      })
+      .catch(function () {
+        aviso('No hemos podido conectar. Inténtalo de nuevo en unos segundos.');
+      });
+  });
+})();
 </script>
-<script src="https://groot.mailerlite.com/js/w/webforms.min.js?v83147fa8ce2d95cb73ece7f28b469519"></script>
 """
 
 PILARES = {

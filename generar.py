@@ -180,12 +180,54 @@ def derivar_meta(cuerpo: str, limite: int = 155) -> str:
     return recorte + "."
 
 
+def pulir_meta(meta: str) -> str:
+    """Quita aperturas genéricas tipo 'Descubre cómo...' y normaliza espacios."""
+    meta = " ".join(meta.split()).strip().strip('"“”')
+    for inicio in ("Descubre cómo ", "Descubre ", "Aprende cómo ", "Aprende "):
+        if meta.lower().startswith(inicio.lower()):
+            meta = meta[len(inicio):]
+            meta = meta[0].upper() + meta[1:] if meta else meta
+            break
+    return meta
+
+
 def componer(titulo: str, cuerpo: str, meta: str, etiquetas: str) -> str:
     """Monta el archivo con el formato exacto que espera el generador de la web."""
     partes = [f"# {titulo}", "", "## Meta descripción", meta, "", AVISO, "", cuerpo]
     if etiquetas:
         partes += ["", f"Etiquetas: {etiquetas}"]
     return "\n".join(partes).strip() + "\n"
+
+
+def reescribir_meta(titulo: str, cuerpo: str, modelo: str) -> str:
+    """Segunda llamada corta: una meta que no repita el arranque del artículo."""
+    peticion = (
+        "Escribe UNA sola frase de entre 140 y 160 caracteres que resuma este artículo "
+        "y sirva como meta descripción para buscadores.\n\n"
+        "Reglas:\n"
+        "- Español de España, tono directo.\n"
+        "- No copies ni parafrasees la primera frase del artículo.\n"
+        "- No empieces por 'Descubre' ni por 'Aprende'.\n"
+        "- Sin comillas, sin punto y coma, sin dos puntos.\n"
+        "- Responde solo con la frase, sin nada más.\n\n"
+        f"Título: {titulo}\n\n"
+        f"Artículo:\n{cuerpo[:2500]}"
+    )
+    cuerpo_peticion = {
+        "model": modelo,
+        "messages": [{"role": "user", "content": peticion}],
+        "temperature": 0.5,
+        "max_tokens": 220,
+    }
+    try:
+        r = httpx.post(f"{LM}/chat/completions", json=cuerpo_peticion,
+                       timeout=httpx.Timeout(180.0, connect=10.0))
+        r.raise_for_status()
+        texto = r.json()["choices"][0]["message"].get("content") or ""
+    except Exception:
+        return ""
+    texto = " ".join(texto.split()).strip().strip('"“”')
+    return texto
 
 
 def validar(texto: str) -> list[str]:
@@ -299,6 +341,13 @@ def procesar(tema: str, categoria: str, claves: str, notas: str, modelo: str) ->
         log("   ERROR: el texto no tiene cuerpo tras el título")
         return False
     meta = meta_modelo if 100 <= len(meta_modelo) <= 200 else derivar_meta(cuerpo)
+    # Si la meta repite el arranque del artículo, se reescribe con una llamada corta
+    if meta and meta.lower()[:70] in cuerpo.lower():
+        log("   la meta repite el inicio; reescribiendo…")
+        nueva = reescribir_meta(titulo, cuerpo, modelo)
+        if 100 <= len(nueva) <= 200:
+            meta = nueva
+    meta = pulir_meta(meta)
     texto = componer(titulo, cuerpo, meta, etiquetas)
     problemas = validar(texto)
 
