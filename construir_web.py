@@ -36,6 +36,49 @@ AUTOR = "Sebastián Prat"
 # Mientras esté vacío, la web muestra "muy pronto" en lugar de un formulario falso.
 FORMULARIO_ACTION = ""
 
+# Formulario de MailerLite (cuenta 2784740, formulario 203766011908851480).
+# El identificador 48368733 es el de la instancia del embed y lo usa el JavaScript
+# de MailerLite para llamar a ml_webform_success_48368733 al terminar.
+MAILERLITE_FORM = """
+<div id="mlb2-48368733" class="ml-form-embedContainer ml-subscribe-form ml-subscribe-form-48368733">
+  <div class="ml-form-embedWrapper embedForm">
+    <div class="ml-form-embedBody row-form">
+      <form class="ml-block-form"
+            action="https://assets.mailerlite.com/jsonp/2784740/forms/203766011908851480/subscribe"
+            method="post" target="_blank"
+            style="display:flex;flex-wrap:wrap;gap:12px;align-items:end">
+        <div style="flex:1;min-width:220px">
+          <label for="ml-email" style="display:block;font-weight:600;margin-bottom:6px">Tu correo</label>
+          <input id="ml-email" name="fields[email]" type="email" required
+                 placeholder="nombre@correo.com" autocomplete="email"
+                 class="ml-field-email ml-validate-email ml-validate-required">
+        </div>
+        <input type="hidden" name="ml-submit" value="1">
+        <input type="hidden" name="anticsrf" value="true">
+        <button class="btn" style="background:#14201A;color:#fff" type="submit">Suscribirme</button>
+        <p style="flex-basis:100%;font-size:13px;margin:0;opacity:.85">
+          Al suscribirte aceptas la <a href="/privacidad/" style="color:inherit">política de privacidad</a>.
+          Puedes darte de baja cuando quieras.
+        </p>
+      </form>
+    </div>
+    <div class="ml-form-successBody row-success" style="display:none">
+      <p style="font-weight:600;margin:0">Gracias. Te hemos enviado un correo para confirmar la suscripción.</p>
+    </div>
+  </div>
+</div>
+<script>
+  function ml_webform_success_48368733() {
+    var c = document.querySelector('.ml-subscribe-form-48368733');
+    if (!c) return;
+    var f = c.querySelector('.row-form'), s = c.querySelector('.row-success');
+    if (f) f.style.display = 'none';
+    if (s) s.style.display = 'block';
+  }
+</script>
+<script src="https://groot.mailerlite.com/js/w/webforms.min.js?v83147fa8ce2d95cb73ece7f28b469519"></script>
+"""
+
 PILARES = {
     "ordena": ("Ordena tu dinero", "ordena-tu-dinero",
                "Presupuesto, fondo de emergencia y control de deudas."),
@@ -183,7 +226,9 @@ def pie():
 
 
 def suscripcion(clase="suscripcion"):
-    if FORMULARIO_ACTION:
+    if MAILERLITE_FORM.strip():
+        form = MAILERLITE_FORM
+    elif FORMULARIO_ACTION:
         form = (f'<form action="{e(FORMULARIO_ACTION)}" method="post" style="display:flex;flex-wrap:wrap;gap:12px;align-items:end">'
                 '<div style="flex:1;min-width:220px"><label for="email" style="display:block;font-weight:600;margin-bottom:6px">Tu correo</label>'
                 '<input id="email" name="email" type="email" required placeholder="nombre@correo.com"></div>'
