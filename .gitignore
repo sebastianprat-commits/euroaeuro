@@ -1,0 +1,15 @@
+# El sitio generado no se versiona: lo construye la acción en cada publicación.
+web/
+
+# Entorno de Python
+.venv/
+__pycache__/
+*.pyc
+
+# Informe de la última construcción
+informe_web.csv
+
+# Basura del sistema
+Thumbs.db
+desktop.ini
+.DS_Store
