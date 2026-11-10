@@ -96,9 +96,9 @@ HERRAMIENTAS = [
      "como": 'Para la pensión pública, usa el Simulador de jubilación de la Seguridad Social, en su <a href="https://sede.seg-social.gob.es/" rel="noopener" target="_blank">sede electrónica</a> (hay que identificarse con Cl@ve, certificado digital o SMS). Calculamos el <strong>hueco mensual</strong> entre esa pensión y el ingreso que quieres, qué capital cubriría ese hueco durante los años que indiques y cuánto ahorrar cada mes para tenerlo. Se supone que la pensión mantiene su poder adquisitivo y que la cuota mensual sube cada año con la inflación. No incluye los impuestos de los retiros ni posibles cambios futuros en las pensiones.'},
 ]
 DESCARGAS = [
-    ("Presupuesto del hogar", "Ingresos, gastos fijos y variables, mes a mes."),
-    ("Seguimiento del patrimonio", "Qué tienes, qué debes y cómo evoluciona."),
-    ("Plan de ahorro por objetivos", "Una hoja para cada meta, con su calendario."),
+    ("Presupuesto del hogar", "Ingresos, gastos fijos y variables, mes a mes.", "presupuesto-hogar.xlsx"),
+    ("Seguimiento del patrimonio", "Qué tienes, qué debes y cómo evoluciona.", "patrimonio.xlsx"),
+    ("Plan de ahorro por objetivos", "Una hoja para cada meta, con su calendario.", "plan-ahorro-objetivos.xlsx"),
 ]
 PAGINAS_PENDIENTES = {
     "sobre-mi": "Sobre mí", "contacto": "Contacto", "aviso-legal": "Aviso legal",
@@ -385,8 +385,14 @@ def portada(articulos):
                                        ("invierte", "Quiero empezar a invertir")], 1))
     herr = "".join(f'<a class="card" href="/herramientas/{h["slug"]}/"><h3>{h["nombre"]}</h3><p class="muted">{h["desc"]}</p></a>'
                    for h in HERRAMIENTAS)
-    desc = "".join(f'<div class="card"><h3>{n}</h3><p class="muted">{d}</p><span class="pronto">Próximamente</span></div>'
-                   for n, d in DESCARGAS)
+    def tarjeta_descarga(n, d, archivo):
+        if os.path.isfile(os.path.join("descargas", archivo)):
+            return (f'<div class="card"><h3>{n}</h3><p class="muted">{d}</p>'
+                    f'<a class="btn" href="/descargas/{archivo}" download>Descargar Excel</a></div>')
+        return (f'<div class="card"><h3>{n}</h3><p class="muted">{d}</p>'
+                f'<span class="pronto">Próximamente</span></div>')
+
+    desc = "".join(tarjeta_descarga(*x) for x in DESCARGAS)
     recientes = "".join(tarjeta_articulo(a) for a in articulos[:6])
     cuerpo = (
         '<section class="wrap sec hero" style="padding-top:40px;display:grid;gap:48px;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));align-items:center">'
@@ -458,6 +464,13 @@ def main():
             f.write(contenido)
 
     escribir("assets/estilo.css", CSS)
+
+    if os.path.isdir("descargas"):
+        os.makedirs(os.path.join(DESTINO, "descargas"), exist_ok=True)
+        for nombre in sorted(os.listdir("descargas")):
+            origen_f = os.path.join("descargas", nombre)
+            if os.path.isfile(origen_f):
+                shutil.copy2(origen_f, os.path.join(DESTINO, "descargas", nombre))
     escribir("index.html", portada(articulos))
     for clave, (_, slug, _) in PILARES.items():
         escribir(f"ruta/{slug}/index.html", pagina_pilar(clave, articulos))
