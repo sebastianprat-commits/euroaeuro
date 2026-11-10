@@ -199,6 +199,65 @@ inhabilitación de Google Analytics</a>.</p>
 """,
 )
 
+PAGINAS_LEGALES["sobre-mi"] = (
+    "Sobre mí",
+    "Quién escribe Euro a Euro: experiencia en banca y fondos, cómo trabajo y qué no vas a encontrar aquí.",
+    f"""
+<main class="wrap sec" style="padding-top:24px">
+<div style="display:grid;gap:36px;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));align-items:center;margin-bottom:34px">
+  <div>
+    <h1 style="font-size:44px;margin-bottom:14px">Sobre mí</h1>
+    <p style="font-size:19px;line-height:1.6;margin:0">
+      Hola, soy <strong>Sebastián Prat</strong>. Llevo más de 15 años trabajando en finanzas:
+      banca privada, fondos de inversión y mercados de capitales. Cuento con la certificación
+      de la European Financial Planning Association (EFPA).
+    </p>
+  </div>
+  <div>
+    <img src="/assets/img/sobre-mi.jpg" alt="Sebastián Prat"
+         style="width:100%;max-width:300px;border-radius:18px;display:block;margin:0 auto">
+  </div>
+</div>
+
+<h2>Por qué existe Euro a Euro</h2>
+<p>En todo este tiempo he comprobado algo que me sigue sorprendiendo: lo que separa a mucha
+gente de unas finanzas ordenadas casi nunca es la falta de capacidad. Es que nadie se lo
+explicó con calma, en orden y sin jerga.</p>
+<p>Euro a Euro nace para eso. Es una ruta clara que va del primer ahorro a la primera inversión,
+con guías, calculadoras y plantillas que puedes usar hoy mismo. Sin prisas y sin saltarse pasos,
+porque lo importante se construye euro a euro.</p>
+
+<h2>Cómo trabajo</h2>
+<ul>
+  <li><strong>Explico el porqué, no solo el qué.</strong> Una regla sin su razón se olvida a la
+      primera dificultad.</li>
+  <li><strong>Nada de promesas de hacerse rico.</strong> Si algo suena demasiado bueno para ser
+      verdad, aquí lo vas a leer con cautela.</li>
+  <li><strong>Contenido atemporal.</strong> No hablo de productos concretos de bancos ni de los
+      tipos de interés del momento, porque cambian demasiado deprisa para ser fiables en un texto.</li>
+  <li><strong>Transparencia con la inteligencia artificial.</strong> Preparo los borradores con
+      ayuda de herramientas de IA y reviso los artículos antes de publicarlos. Si encuentras un
+      error, escríbeme y lo corrijo.</li>
+</ul>
+
+<h2>Fuera de las finanzas</h2>
+<p>He sido entrenador de fútbol base más de 12 años. Tengo el título de entrenador de nivel 2 y
+un máster en dirección deportiva por la Federación Española de Fútbol. De ahí viene mi forma de
+enseñar: lo que de verdad se aprende es lo que se repite, paso a paso, sin saltarse etapas.
+Las finanzas personales funcionan igual.</p>
+
+<h2>Lo que esta web no es</h2>
+<p>Euro a Euro es un proyecto educativo. No ofrezco aquí asesoramiento personalizado y nada de lo
+que publico es una recomendación de comprar o vender un producto financiero concreto. Antes de
+tomar una decisión importante, consulta con un profesional que conozca tu situación.</p>
+
+<h2>Contacto</h2>
+<p>¿Una duda, una errata o una guía que te gustaría leer? Escríbeme a
+<a href="mailto:{EMAIL}">{EMAIL}</a>. Leo todo, aunque no siempre pueda contestar al día siguiente.</p>
+</main>
+""",
+)
+
 PAGINAS_LEGALES["contacto"] = (
     "Contacto",
     "Cómo escribir a Euro a Euro para dudas, sugerencias o ejercicio de derechos.",

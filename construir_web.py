@@ -581,6 +581,16 @@ def main():
             origen_f = os.path.join("descargas", nombre)
             if os.path.isfile(origen_f):
                 shutil.copy2(origen_f, os.path.join(DESTINO, "descargas", nombre))
+
+    # Archivos estáticos (imágenes, fuentes, lo que no genera el script)
+    if os.path.isdir("estatico"):
+        for raiz, _, archivos in os.walk("estatico"):
+            for nombre in archivos:
+                origen_f = os.path.join(raiz, nombre)
+                relativo = os.path.relpath(origen_f, "estatico")
+                destino_f = os.path.join(DESTINO, relativo)
+                os.makedirs(os.path.dirname(destino_f), exist_ok=True)
+                shutil.copy2(origen_f, destino_f)
     escribir("index.html", portada(articulos))
     for clave, (_, slug, _) in PILARES.items():
         escribir(f"ruta/{slug}/index.html", pagina_pilar(clave, articulos))
