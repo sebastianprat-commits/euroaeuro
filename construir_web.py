@@ -144,7 +144,7 @@ DESCARGAS = [
     ("Seguimiento del patrimonio", "Qué tienes, qué debes y cómo evoluciona.", "patrimonio.xlsx"),
     ("Plan de ahorro por objetivos", "Una hoja para cada meta, con su calendario.", "plan-ahorro-objetivos.xlsx"),
 ]
-GA_ID = ""  # ID de medición de GA4 (G-XXXXXXXXXX). Mientras esté vacío no se carga analítica.
+GTM_ID = "GTM-PFLW5T85"  # Contenedor de Google Tag Manager. Vacío = no se carga nada.
 
 CONSENTIMIENTO = """
 <style>
@@ -170,17 +170,23 @@ CONSENTIMIENTO = """
 </div>
 <script>
 (function () {
-  var ID = "__GA__";
+  var ID = "__GTM__";
   function cargar() {
     if (!ID) return;
-    var s = document.createElement("script");
-    s.async = true;
-    s.src = "https://www.googletagmanager.com/gtag/js?id=" + ID;
-    document.head.appendChild(s);
     window.dataLayer = window.dataLayer || [];
     function gtag() { dataLayer.push(arguments); }
+    gtag("consent", "default", {
+      ad_storage: "denied",
+      ad_user_data: "denied",
+      ad_personalization: "denied",
+      analytics_storage: "denied"
+    });
     gtag("js", new Date());
-    gtag("config", ID, { anonymize_ip: true });
+    gtag("consent", "update", { analytics_storage: "granted" });
+    var s = document.createElement("script");
+    s.async = true;
+    s.src = "https://www.googletagmanager.com/gtm.js?id=" + ID;
+    document.head.appendChild(s);
   }
   var caja = document.getElementById("cc");
   if (!ID) { caja.style.display = "none"; return; }
@@ -199,7 +205,7 @@ CONSENTIMIENTO = """
   };
 })();
 </script>
-""".replace("__GA__", GA_ID)
+""".replace("__GTM__", GTM_ID)
 
 PAGINAS_PENDIENTES = {
     "sobre-mi": "Sobre mí", "contacto": "Contacto", "aviso-legal": "Aviso legal",
