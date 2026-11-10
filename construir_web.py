@@ -144,7 +144,7 @@ DESCARGAS = [
     ("Seguimiento del patrimonio", "Qué tienes, qué debes y cómo evoluciona.", "patrimonio.xlsx"),
     ("Plan de ahorro por objetivos", "Una hoja para cada meta, con su calendario.", "plan-ahorro-objetivos.xlsx"),
 ]
-GTM_ID = "GTM-PFLW5T85"  # Contenedor de Google Tag Manager. Vacío = no se carga nada.
+GA_ID = "G-0QKFLMK0QW"  # Medición de Google Analytics 4. Vacío = no se carga analítica.
 
 CONSENTIMIENTO = """
 <style>
@@ -170,7 +170,7 @@ CONSENTIMIENTO = """
 </div>
 <script>
 (function () {
-  var ID = "__GTM__";
+  var ID = "__GA__";
   function cargar() {
     if (!ID) return;
     window.dataLayer = window.dataLayer || [];
@@ -185,8 +185,9 @@ CONSENTIMIENTO = """
     gtag("consent", "update", { analytics_storage: "granted" });
     var s = document.createElement("script");
     s.async = true;
-    s.src = "https://www.googletagmanager.com/gtm.js?id=" + ID;
+    s.src = "https://www.googletagmanager.com/gtag/js?id=" + ID;
     document.head.appendChild(s);
+    gtag("config", ID, { anonymize_ip: true });
   }
   var caja = document.getElementById("cc");
   if (!ID) { caja.style.display = "none"; return; }
@@ -205,7 +206,7 @@ CONSENTIMIENTO = """
   };
 })();
 </script>
-""".replace("__GTM__", GTM_ID)
+""".replace("__GA__", GA_ID)
 
 PAGINAS_PENDIENTES = {
     "sobre-mi": "Sobre mí", "contacto": "Contacto", "aviso-legal": "Aviso legal",

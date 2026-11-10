@@ -172,9 +172,6 @@ comparten con nadie y no identifican a la persona.</p>
   <tr><td>_ga_*</td><td>Google</td><td>Mantener el estado de la sesión de analítica</td><td>2 años</td></tr>
 </table>
 <p>No se usan cookies publicitarias, ni de redes sociales, ni de perfilado.</p>
-<p><strong>Google Tag Manager</strong> es solo el contenedor que carga la etiqueta de analítica:
-no instala cookies por sí mismo. La etiqueta que hay dentro (Google Analytics 4) sí lo hace, y
-solo se ejecuta si has aceptado.</p>
 <p><strong>Al enviar el formulario</strong>, el envío se procesa en MailerLite, que puede dejar
 cookies técnicas propias en su dominio para confirmar la operación. No se activan por el simple
 hecho de visitar la web.</p>
