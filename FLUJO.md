@@ -88,9 +88,13 @@ git add -A && git commit -m "Retiro un articulo" && git push
 
 | Modelo | Velocidad | Cuándo usarlo |
 |---|---|---|
-| `qwen/qwen3.5-9b` (por defecto) | ~35 s | El día a día |
-| `qwen/qwen3.8-27b` | ~3 min | Un artículo importante, o si el 9B no da el tono |
+| `qwen/qwen3.8-27b` (por defecto) | ~5,5 min | La calidad que quieres publicar |
+| `qwen/qwen3.5-9b` | ~1 min | Borradores rápidos, para tantear un tema |
 
 ```bat
-.venv\Scripts\python.exe generar.py --siguiente 1 --modelo qwen/qwen3.8-27b
+.venv\Scripts\python.exe generar.py --siguiente 1 --modelo qwen/qwen3.5-9b
 ```
+
+Nota: los dos modelos tienen el razonamiento desactivado en su `model.yaml` de LM Studio.
+Si una actualización lo reactiva, el modelo "piensa" hasta agotar los tokens y devuelve texto
+vacío. Se arregla poniendo `defaultValue: false` en el campo `enableThinking`.
