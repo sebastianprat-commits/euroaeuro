@@ -8,7 +8,7 @@ Uso:
     python generar.py --lista
     python generar.py --siguiente 1
     python generar.py --tema "Cómo ahorrar con poco dinero" --categoria ahorra
-    python generar.py --siguiente 3 --modelo qwen/qwen3.8-27b
+    python generar.py --siguiente 3 --modelo qwen/qwen3.5-9b   (borradores rápidos)
 
 Nada se publica solo: mover el .md de borradores/ a publicado/ es tu decisión.
 """
@@ -32,7 +32,7 @@ BORRADORES = AQUI / "contenido" / "borradores"
 PUBLICADOS = AQUI / "contenido" / "publicado"
 
 LM = "http://127.0.0.1:1234/v1"
-MODELO_PREFERIDO = "qwen/qwen3.5-9b"
+MODELO_PREFERIDO = "qwen/qwen3.8-27b"
 
 AVISO = (
     "*Este artículo tiene un propósito informativo y educativo general. No constituye "
@@ -95,34 +95,68 @@ Una sola frase de entre 140 y 160 caracteres que resuma el artículo.
 
 Dos o tres párrafos de introducción que planteen el problema real del lector.
 
-De cuatro a seis secciones. Cada una empieza con un encabezado "## " propio, escrito por ti,
-específico del tema, y sigue con dos o tres párrafos. Los encabezados no se numeran y no se
-repiten entre sí.
+## Encabezado propio 1
+Dos o tres párrafos. Cuanto más concreto, mejor: ejemplos, situaciones y matices.
 
-## En resumen
-- Primera idea clave.
-- Segunda idea clave.
-- Tercera idea clave.
+## Encabezado propio 2
+Dos o tres párrafos.
+
+## Encabezado propio 3
+Dos o tres párrafos.
+
+## Ejemplo con cifras
+Una tabla en Markdown con cabecera, entre 4 y 6 filas y una fila final de total:
+
+| Concepto | Importe | Frecuencia | Coste anual |
+|---|---|---|---|
+| Ejemplo uno | 30 € | Mensual | 360 € |
+| Ejemplo dos | 5 € | Semanal | 260 € |
+| **Total** | | | **620 €** |
+
+Dos párrafos explicando qué enseña la tabla. Di expresamente que las cifras son ilustrativas.
+
+## Errores comunes a evitar
+- **Error concreto.** Por qué es un error y qué hacer en su lugar.
+- **Otro error concreto.** Explicación.
+- **Tercer error.** Explicación.
+- **Cuarto error.** Explicación.
+
+## Preguntas frecuentes
+**¿Primera pregunta del lector?**
+Respuesta de dos o tres frases, directa.
+
+**¿Segunda pregunta?**
+Respuesta.
+
+**¿Tercera pregunta?**
+Respuesta.
+
+**¿Cuarta pregunta?**
+Respuesta.
+
+## Para cerrar
+Dos párrafos de cierre, en prosa y sin listas. Una idea que se quede con el lector.
 
 Etiquetas: palabra1, palabra2, palabra3, palabra4, palabra5
 
 REGLAS:
-1. Entre 900 y 1300 palabras en total.
-2. De 4 a 6 secciones con "## ". No uses "# " salvo en el título.
+1. Entre 1400 y 1900 palabras. Si te quedas corto, profundiza en los matices, no repitas ideas.
+2. Seis a ocho secciones con "## ", además del título y de la meta descripción.
 3. Los encabezados los inventas tú para este tema concreto. Prohibido usar "Primera sección",
-   "Segunda sección", "Introducción", "Conclusión" o cualquier texto de esta plantilla como
-   encabezado. Prohibido copiar los encabezados de otro artículo.
-4. Escribe íntegramente en español. Ni una palabra en inglés (nada de "affordable", "cash flow",
+   "Segunda sección", "Introducción" o cualquier texto de esta plantilla como encabezado.
+4. La tabla es obligatoria, con cabecera y fila de total. Las cifras, redondas e ilustrativas.
+5. La sección "## Errores comunes a evitar" es obligatoria, con cuatro puntos en negrita.
+6. La sección "## Preguntas frecuentes" es obligatoria, con cuatro preguntas en negrita y respuesta.
+7. Escribe íntegramente en español. Ni una palabra en inglés (nada de "affordable", "cash flow",
    "mindset", "financial").
-5. Párrafos de 2 a 4 frases. Varía la longitud de las frases: alguna corta, alguna más larga.
-6. Incluye al menos un ejemplo numérico con cifras redondas y di expresamente que es ilustrativo.
-7. No inventes estadísticas, informes, ni cifras oficiales. No cites fuentes que no existan.
-8. No nombres bancos, fondos, productos comerciales ni marcas.
-9. No recomiendes comprar ni vender nada concreto.
-10. No prometas rentabilidades ni uses "hazte rico", "fácil" o "sin riesgo".
-11. No hables de tipos de interés actuales ni de la situación del mercado: cambian y el texto envejece.
-12. Empieza directamente por "# ". Nada de "Aquí tienes el artículo" ni comentarios finales.
-13. Termina con la línea de etiquetas, sin nada después."""
+8. Párrafos de 2 a 4 frases. Varía la longitud: alguna frase corta, alguna más larga.
+9. No inventes estadísticas, informes, ni cifras oficiales. No cites fuentes que no existan.
+10. No nombres bancos, fondos, productos comerciales ni marcas.
+11. No recomiendes comprar ni vender nada concreto.
+12. No prometas rentabilidades ni uses "hazte rico", "fácil" o "sin riesgo".
+13. No hables de tipos de interés actuales ni de la situación del mercado: cambian y el texto envejece.
+14. Empieza directamente por "# ". Nada de "Aquí tienes el artículo" ni comentarios finales.
+15. Termina con la línea de etiquetas, sin nada después."""
 
 
 def limpiar(texto: str) -> str:
@@ -202,32 +236,36 @@ def componer(titulo: str, cuerpo: str, meta: str, etiquetas: str) -> str:
 def reescribir_meta(titulo: str, cuerpo: str, modelo: str) -> str:
     """Segunda llamada corta: una meta que no repita el arranque del artículo."""
     peticion = (
-        "Escribe UNA sola frase de entre 140 y 160 caracteres que resuma este artículo "
-        "y sirva como meta descripción para buscadores.\n\n"
+        "Escribe UNA sola frase completa, de entre 140 y 160 caracteres, que resuma este "
+        "artículo y sirva como meta descripción para buscadores.\n\n"
         "Reglas:\n"
         "- Español de España, tono directo.\n"
         "- No copies ni parafrasees la primera frase del artículo.\n"
-        "- No empieces por 'Descubre' ni por 'Aprende'.\n"
+        "- La frase debe estar terminada: sujeto, verbo y punto final.\n"
         "- Sin comillas, sin punto y coma, sin dos puntos.\n"
         "- Responde solo con la frase, sin nada más.\n\n"
         f"Título: {titulo}\n\n"
         f"Artículo:\n{cuerpo[:2500]}"
     )
-    cuerpo_peticion = {
-        "model": modelo,
-        "messages": [{"role": "user", "content": peticion}],
-        "temperature": 0.5,
-        "max_tokens": 220,
-    }
-    try:
-        r = httpx.post(f"{LM}/chat/completions", json=cuerpo_peticion,
-                       timeout=httpx.Timeout(180.0, connect=10.0))
-        r.raise_for_status()
-        texto = r.json()["choices"][0]["message"].get("content") or ""
-    except Exception:
-        return ""
-    texto = " ".join(texto.split()).strip().strip('"“”')
-    return texto
+    for intento in (1, 2):
+        cuerpo_peticion = {
+            "model": modelo,
+            "messages": [{"role": "user", "content": peticion}],
+            "temperature": 0.5 + 0.1 * intento,
+            "max_tokens": 300,
+        }
+        try:
+            r = httpx.post(f"{LM}/chat/completions", json=cuerpo_peticion,
+                           timeout=httpx.Timeout(300.0, connect=10.0))
+            r.raise_for_status()
+            texto = r.json()["choices"][0]["message"].get("content") or ""
+        except Exception:
+            return ""
+        texto = " ".join(texto.split()).strip().strip('"“”')
+        if 120 <= len(texto) <= 200 and texto.endswith((".", "!", "?")):
+            return texto
+        peticion += "\n\nLa respuesta anterior quedó incompleta. Escribe una frase entera y cerrada."
+    return ""
 
 
 def validar(texto: str) -> list[str]:
@@ -240,10 +278,21 @@ def validar(texto: str) -> list[str]:
     if "no constituye asesoramiento financiero personalizado" not in texto.lower():
         problemas.append("falta la frase de aviso legal")
     palabras = len(texto.split())
-    if palabras < 700:
+    if palabras < 1200:
         problemas.append(f"demasiado corto ({palabras} palabras)")
-    if palabras > 1800:
+    if palabras > 2600:
         problemas.append(f"demasiado largo ({palabras} palabras)")
+    if texto.count("|---") < 1:
+        problemas.append("falta la tabla de ejemplo")
+    secciones = len(re.findall(r"^## ", texto, re.M))
+    if secciones < 6:
+        problemas.append(f"solo {secciones} secciones (se piden 6-8)")
+    if "errores comunes" not in texto.lower():
+        problemas.append("falta la sección 'Errores comunes a evitar'")
+    if "preguntas frecuentes" not in texto.lower():
+        problemas.append("falta la sección 'Preguntas frecuentes'")
+    if len(re.findall(r"\*\*¿[^*]+\?\*\*", texto)) < 3:
+        problemas.append("menos de 3 preguntas frecuentes en negrita")
     if not re.search(r"^## ", texto, re.M):
         problemas.append("no hay secciones '## '")
     if re.search(r"^##\s*(primera|segunda|tercera|cuarta|quinta|sexta)\s+secci[oó]n", texto, re.I | re.M):
@@ -283,7 +332,7 @@ def generar(tema: str, categoria: str, palabras_clave: str, notas: str,
         ],
         "temperature": 0.6,
         "top_p": 0.9,
-        "max_tokens": 3200,
+        "max_tokens": 4800,
         "stream": True,
     }
     with httpx.stream("POST", f"{LM}/chat/completions", json=cuerpo,
