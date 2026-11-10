@@ -25,6 +25,7 @@ import time
 import markdown
 
 from limpieza import limpiar_articulo, parece_cortado
+from legales import PAGINAS_LEGALES
 
 # ---------------------------------------------------------------- AJUSTES
 ORIGEN = os.path.join("contenido", "publicado")
@@ -143,6 +144,63 @@ DESCARGAS = [
     ("Seguimiento del patrimonio", "Qué tienes, qué debes y cómo evoluciona.", "patrimonio.xlsx"),
     ("Plan de ahorro por objetivos", "Una hoja para cada meta, con su calendario.", "plan-ahorro-objetivos.xlsx"),
 ]
+GA_ID = ""  # ID de medición de GA4 (G-XXXXXXXXXX). Mientras esté vacío no se carga analítica.
+
+CONSENTIMIENTO = """
+<style>
+#cc{position:fixed;left:0;right:0;bottom:0;z-index:99;display:none;gap:16px 22px;align-items:center;
+    justify-content:space-between;flex-wrap:wrap;padding:16px 22px;background:#14201A;color:#F5F1E8;
+    font-size:14px;line-height:1.5;box-shadow:0 -6px 24px rgba(0,0,0,.22)}
+#cc p{margin:0;max-width:660px}
+#cc a{color:inherit;text-decoration:underline}
+#cc .acciones{display:flex;gap:10px;flex-wrap:wrap}
+#cc button{font-family:inherit;font-size:14px;font-weight:600;border-radius:8px;padding:10px 18px;
+           cursor:pointer;border:1px solid #7E8C84;background:transparent;color:inherit}
+#cc button.si{background:#C9A227;border-color:#C9A227;color:#14201A}
+#cc button:hover{opacity:.88}
+</style>
+<div id="cc" role="dialog" aria-live="polite" aria-label="Aviso de cookies">
+  <p>Uso cookies propias y de Google Analytics para saber qué contenido se lee.
+     Si aceptas, se cargan; si no, la web funciona igual.
+     <a href="/cookies/">Más información</a>.</p>
+  <div class="acciones">
+    <button id="cc-no" type="button">Solo lo necesario</button>
+    <button id="cc-si" class="si" type="button">Aceptar</button>
+  </div>
+</div>
+<script>
+(function () {
+  var ID = "__GA__";
+  function cargar() {
+    if (!ID) return;
+    var s = document.createElement("script");
+    s.async = true;
+    s.src = "https://www.googletagmanager.com/gtag/js?id=" + ID;
+    document.head.appendChild(s);
+    window.dataLayer = window.dataLayer || [];
+    function gtag() { dataLayer.push(arguments); }
+    gtag("js", new Date());
+    gtag("config", ID, { anonymize_ip: true });
+  }
+  var caja = document.getElementById("cc");
+  if (!ID) { caja.style.display = "none"; return; }
+  var guardado = null;
+  try { guardado = localStorage.getItem("consentimiento"); } catch (e) {}
+  if (guardado === "1") { cargar(); }
+  else if (guardado !== "0") { caja.style.display = "flex"; }
+  document.getElementById("cc-si").onclick = function () {
+    try { localStorage.setItem("consentimiento", "1"); } catch (e) {}
+    caja.style.display = "none";
+    cargar();
+  };
+  document.getElementById("cc-no").onclick = function () {
+    try { localStorage.setItem("consentimiento", "0"); } catch (e) {}
+    caja.style.display = "none";
+  };
+})();
+</script>
+""".replace("__GA__", GA_ID)
+
 PAGINAS_PENDIENTES = {
     "sobre-mi": "Sobre mí", "contacto": "Contacto", "aviso-legal": "Aviso legal",
     "privacidad": "Política de privacidad", "cookies": "Política de cookies",
@@ -252,7 +310,7 @@ def pagina(titulo, descripcion, url, cuerpo, noindex=False, extra_head=""):
             f'<meta property="og:type" content="website"><meta property="og:url" content="{SITIO}{url}">'
             f'<meta property="og:site_name" content="{NOMBRE}">{FUENTES}'
             f'<link rel="stylesheet" href="/assets/estilo.css">{extra_head}</head><body>'
-            f'{cabecera()}{cuerpo}{pie()}</body></html>')
+            f'{cabecera()}{cuerpo}{pie()}{CONSENTIMIENTO}</body></html>')
 
 
 # --------------------------------------------------------------- CONTENIDO
@@ -525,7 +583,22 @@ def main():
     escribir("herramientas/index.html", pagina_herramientas())
     for h in HERRAMIENTAS:
         escribir(f"herramientas/{h['slug']}/index.html", pagina_herramienta(h))
+    ESTILO_LEGAL = (
+        '<style>.sec table{border-collapse:collapse;width:100%;margin:14px 0;font-size:15px}'
+        '.sec th,.sec td{border:1px solid var(--borde);padding:10px 12px;text-align:left;vertical-align:top}'
+        '.sec th{background:#F3EDDD;font-weight:600}'
+        '.sec h2{margin-top:28px;font-size:22px}'
+        '.sec ul,.sec ol{margin:10px 0 10px 22px}'
+        '.sec li{margin-bottom:6px}'
+        '.sec p{line-height:1.65}</style>'
+    )
     for slug, titulo in PAGINAS_PENDIENTES.items():
+        if slug in PAGINAS_LEGALES:
+            _, descripcion, cuerpo = PAGINAS_LEGALES[slug]
+            escribir(f"{slug}/index.html",
+                     pagina(f"{titulo} | {NOMBRE}", descripcion, f"/{slug}/", cuerpo,
+                            extra_head=ESTILO_LEGAL))
+            continue
         cuerpo = (f'<main class="wrap sec" style="padding-top:24px"><h1 style="font-size:42px;margin-bottom:16px">{titulo}</h1>'
                   '<p class="muted">Página en preparación.</p></main>')
         escribir(f"{slug}/index.html", pagina(f"{titulo} | {NOMBRE}", titulo, f"/{slug}/", cuerpo, noindex=True))
