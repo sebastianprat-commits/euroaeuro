@@ -306,6 +306,10 @@ a.card{text-decoration:none;color:var(--tinta);display:block}a.card:hover{border
 .nota p{margin:0}
 .aviso{font-size:14px;color:var(--gris);border-top:1px solid var(--borde);margin-top:48px;padding-top:16px}
 .relacionados{margin-top:48px}
+.criterio-cta{background:#EDF4EE;border-left:4px solid #4A7C59;padding:18px 22px;
+  margin:32px 0 0;border-radius:0 6px 6px 0;font-size:15.5px;line-height:1.65;color:#2A3A2E}
+.criterio-cta strong{display:block;margin-bottom:4px;color:#24382A}
+.criterio-cta a{color:#2F6B45;font-weight:600}
 @media(max-width:700px){.articulo h1{font-size:34px}.hero h1{font-size:40px!important}}
 """
 
@@ -579,6 +583,15 @@ def pagina_pilar(clave, articulos):
     return pagina(f"{nombre} — guías | {NOMBRE}", desc, f"/ruta/{slug}/", cuerpo)
 
 
+CTA_CRITERIO = (
+    '<div class="criterio-cta"><strong>¿Quieres profundizar más?</strong>'
+    'En <a href="https://criteriofinanciero.org/?utm_source=euroaeuro&amp;utm_medium=articulo'
+    '&amp;utm_campaign=enlace_contextual">CriterioFinanciero</a> tienes análisis de empresas '
+    'con valoración propia por descuento de flujos, comparativa con competidores y un test de '
+    'perfil gratuito que no pide datos bancarios.</div>'
+)
+
+
 def pagina_articulo(a, articulos):
     nombre, slug, _ = PILARES[a["pilar"]]
     rel = [x for x in articulos if x["pilar"] == a["pilar"] and x["slug"] != a["slug"]][:3]
@@ -596,7 +609,8 @@ def pagina_articulo(a, articulos):
               f'<div class="prose">{a["cuerpo"]}</div>'
               '<p class="aviso">Este artículo tiene una finalidad informativa y educativa general. No constituye asesoramiento '
               'financiero personalizado. Para decisiones concretas sobre tus ahorros o inversiones, consulta con un profesional '
-              f'que valore tu situación particular.</p>{relacionados}</main>' + suscripcion("suscripcion"))
+              f'que valore tu situación particular.</p>'
+              + CTA_CRITERIO + f'{relacionados}</main>' + suscripcion("suscripcion"))
     return pagina(f'{a["titulo"]} | {NOMBRE}', a["descripcion"], f'/guias/{a["slug"]}/', cuerpo,
                   extra_head=f'<script type="application/ld+json">{ld}</script>')
 
